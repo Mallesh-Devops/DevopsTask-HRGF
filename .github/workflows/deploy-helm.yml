@@ -44,7 +44,7 @@ jobs:
       - name: Verify kubectl connectivity
         run: |
           kubectl get nodes
-          kubectl version --short
+          kubectl version 
 
       - name: Deploy Helm chart
         run: |
