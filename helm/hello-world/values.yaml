@@ -1,0 +1,22 @@
+replicaCount: 1
+
+image:
+  repository: malleshdumpati/hello-python
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: LoadBalancer
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: malleshdumpati.xyz
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
