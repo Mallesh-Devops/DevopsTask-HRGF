@@ -1,0 +1,42 @@
+name: "Terraform Infrastructure Change Management Pipeline with GitHub Actions"
+ 
+on:
+  workflow_dispatch: 
+env:
+ TF_LOG: INFO
+ DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+ AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+ AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+ 
+jobs:
+ terraform:
+   name: "Terraform Infrastructure Change Management"
+   runs-on: ubuntu-latest
+   defaults:
+     run:
+       shell: bash
+       working-directory: ./terraform
+ 
+   steps:
+     - name: Checkout the repository to the runner
+       uses: actions/checkout@v4
+ 
+     - name: Setup Terraform with specified version on the runner
+       uses: hashicorp/setup-terraform@v3
+       with:
+         terraform_version: 1.14.3
+    
+     - name: Terraform init
+       id: init
+       run: terraform init -migrate-state -input=false -backend-config="bucket=terraform-devopstask" -backend-config="endpoint=https://sgp1.digitaloceanspaces.com" -backend-config="region=us-east-1" -backend-config="key=k8s-cluster/terraform.tfstate"
+ 
+ 
+     - name: Terraform plan
+       id: plan
+       run: terraform plan -no-color -input=false
+       continue-on-error: true
+    
+    
+ 
+     - name: Terraform Apply
+       run: terraform apply -auto-approve -input=false
